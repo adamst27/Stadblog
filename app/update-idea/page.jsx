@@ -1,33 +1,38 @@
-"use client";
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router"; // Import useRouter from next/router
 import Form from "@components/Form";
+
 const editIdea = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [post, setPost] = useState({
     idea: "",
     description: "",
   });
-  const ideaId = searchParams.get("id");
+  const { id } = router.query; // Access query directly from router
+
   useEffect(() => {
     const getIdeaDetails = async () => {
-      const response = await fetch(`/api/idea/${ideaId}`);
-      const data = await response.json();
-      setPost({
-        idea: data.idea,
-        description: data.description,
-      });
+      if (!id) return; // Exit early if id is not present
+      try {
+        const response = await fetch(`/api/idea/${id}`);
+        const data = await response.json();
+        setPost({
+          idea: data.idea,
+          description: data.description,
+        });
+      } catch (error) {
+        console.error("Error fetching idea details:", error);
+      }
     };
-    if (ideaId) getIdeaDetails();
-  }, [ideaId]);
+    getIdeaDetails();
+  }, [id]);
+
   const updateIdea = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    if (!ideaId) return alert("idea id not found");
     try {
-      const res = await fetch(`/api/idea/${ideaId}`, {
+      const res = await fetch(`/api/idea/${id}`, {
         method: "PATCH",
         body: JSON.stringify({
           idea: post.idea,
@@ -36,14 +41,16 @@ const editIdea = () => {
       });
       if (res.ok) {
         router.push("/profile");
+      } else {
+        console.error("Failed to update idea:", res.statusText);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating idea:", error);
     } finally {
       setSubmitting(false);
     }
   };
-  console.log(post);
+
   return (
     <Form
       type="Update"
