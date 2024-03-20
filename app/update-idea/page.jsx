@@ -1,68 +1,60 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import Form from "@components/Form";
 
-const EditIdea = () => {
+const UpdateIdea = () => {
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-  const [post, setPost] = useState({
-    idea: "",
-    description: "",
-  });
+  const searchParams = useSearchParams();
+  const ideaId = searchParams.get("id");
+
+  const [post, setPost] = useState({ idea: "", description: "" });
+  const [submitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!router.isReady) return; // Wait until router is ready
-    const fetchIdeaDetails = async () => {
-      const searchParams = new URLSearchParams(window.location.search);
-      const ideaId = searchParams.get("id");
-      if (!ideaId) return;
-      try {
-        const response = await fetch(`/api/idea/${ideaId}`);
-        if (!response.ok) throw new Error("Failed to fetch idea details");
-        const data = await response.json();
-        setPost({
-          idea: data.idea,
-          description: data.description,
-        });
-      } catch (error) {
-        console.error("Error fetching idea details:", error);
-      }
+    const getPromptDetails = async () => {
+      const response = await fetch(`/api/idea/${ideaId}`);
+      const data = await response.json();
+
+      setPost({
+        idea: data.idea,
+        description: data.description,
+      });
     };
 
-    fetchIdeaDetails();
-  }, [router.isReady]); // Re-run effect when router.isReady changes
+    if (ideaId) getPromptDetails();
+  }, [ideaId]);
 
   const updateIdea = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
+    setIsSubmitting(true);
+
+    if (!ideaId) return alert("Missing ideaId!");
+
     try {
-      const res = await fetch(`/api/idea/${router.query.id}`, {
+      const response = await fetch(`/api/idea/${ideaId}`, {
         method: "PATCH",
         body: JSON.stringify({
           idea: post.idea,
           description: post.description,
         }),
       });
-      if (res.ok) {
-        router.push("/profile");
-      } else {
-        console.error("Failed to update idea:", res.statusText);
+
+      if (response.ok) {
+        router.push("/");
       }
     } catch (error) {
-      console.error("Error updating idea:", error);
+      console.log(error);
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
-  if (!router.isReady) {
-    return <div>Loading...</div>; // Render loading state until router is ready
-  }
-
   return (
     <Form
-      type="Update"
+      type="Edit"
       post={post}
       setPost={setPost}
       submitting={submitting}
@@ -71,4 +63,4 @@ const EditIdea = () => {
   );
 };
 
-export default EditIdea;
+export default UpdateIdea;
