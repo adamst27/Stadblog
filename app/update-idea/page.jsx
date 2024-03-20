@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
@@ -12,16 +11,37 @@ const UpdateIdea = () => {
 
   const { data, error } = useSWR(`/api/idea/${ideaId}`, fetcher, {
     revalidateOnFocus: false, // Avoid refetching on focus
+    initialData: { idea: "", description: "" }, // Default data
   });
 
   const fetcher = (url) => fetch(url).then((res) => res.json());
 
-  const initialPost = { idea: "", description: "" }; // Default data
-  const [post, setPost] = useState(initialPost);
+  const [post, setPost] = useState(data || { idea: "", description: "" }); // Use data or default
   const [submitting, setIsSubmitting] = useState(false);
+
+  // Fetch data on the server-side for guaranteed prerendering (optional)
+  export async function getStaticProps({ params }) {
+    const ideaId = params.id; // Access ideaId from route parameters
+    if (!ideaId) return { notFound: true }; // Handle missing ideaId
+
+    try {
+      const response = await fetch(`/api/idea/${ideaId}`);
+      const data = await response.json();
+      return {
+        props: {
+          initialPost: data,
+        },
+      };
+    } catch (error) {
+      console.error(error); // Handle fetch errors gracefully
+      return { notFound: true }; // Potentially handle error cases with a 404 page
+    }
+  }
 
   useEffect(() => {
     if (ideaId && !router.isFallback) {
+      // Client-side data fetching (optional)
+      // This can be used if `getStaticProps` is not suitable
       const getPromptDetails = async () => {
         const response = await fetch(`/api/idea/${ideaId}`);
         const data = await response.json();
