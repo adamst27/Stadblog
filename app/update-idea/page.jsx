@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router"; // Import useRouter instead of next/navigation
+import { useRouter } from "next/router";
 import Form from "@components/Form";
 
 const EditIdea = () => {
@@ -12,10 +12,11 @@ const EditIdea = () => {
   });
 
   useEffect(() => {
+    if (!router.isReady) return; // Wait until router is ready
     const fetchIdeaDetails = async () => {
-      const searchParams = new URLSearchParams(window.location.search); // Use window.location.search directly
+      const searchParams = new URLSearchParams(window.location.search);
       const ideaId = searchParams.get("id");
-      if (!ideaId) return; // Do nothing if ideaId is not available
+      if (!ideaId) return;
       try {
         const response = await fetch(`/api/idea/${ideaId}`);
         if (!response.ok) throw new Error("Failed to fetch idea details");
@@ -29,11 +30,8 @@ const EditIdea = () => {
       }
     };
 
-    // Check if window is defined to prevent SSR errors
-    if (typeof window !== "undefined") {
-      fetchIdeaDetails();
-    }
-  }, []);
+    fetchIdeaDetails();
+  }, [router.isReady]); // Re-run effect when router.isReady changes
 
   const updateIdea = async (e) => {
     e.preventDefault();
@@ -58,8 +56,8 @@ const EditIdea = () => {
     }
   };
 
-  if (!router.query.id) {
-    return <div>Loading...</div>; // Render loading state until ideaId is available
+  if (!router.isReady) {
+    return <div>Loading...</div>; // Render loading state until router is ready
   }
 
   return (
