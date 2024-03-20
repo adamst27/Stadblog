@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router"; // Import useRouter from next/router
+import { useRouter, useSearchParams } from "next/navigation";
 import Form from "@components/Form";
 
 const editIdea = () => {
@@ -10,13 +10,14 @@ const editIdea = () => {
     idea: "",
     description: "",
   });
-  const { id } = router.query; // Access query directly from router
+  const searchParams = useSearchParams();
+  const ideaId = searchParams.get("id");
 
   useEffect(() => {
     const getIdeaDetails = async () => {
       if (!id) return; // Exit early if id is not present
       try {
-        const response = await fetch(`/api/idea/${id}`);
+        const response = await fetch(`/api/idea/${ideaId}`);
         const data = await response.json();
         setPost({
           idea: data.idea,
@@ -27,13 +28,13 @@ const editIdea = () => {
       }
     };
     getIdeaDetails();
-  }, [id]);
+  }, [ideaId]);
 
   const updateIdea = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/idea/${id}`, {
+      const res = await fetch(`/api/idea/${ideaId}`, {
         method: "PATCH",
         body: JSON.stringify({
           idea: post.idea,
