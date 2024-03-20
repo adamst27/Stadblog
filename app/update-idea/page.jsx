@@ -15,7 +15,7 @@ const editIdea = () => {
 
   useEffect(() => {
     const getIdeaDetails = async () => {
-      if (!id) return; // Exit early if id is not present
+      if (!ideaId) return; // Corrected to check for `ideaId` instead of `id`
       try {
         const response = await fetch(`/api/idea/${ideaId}`);
         const data = await response.json();
