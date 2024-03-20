@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router"; // Import useRouter instead of next/navigation
 import Form from "@components/Form";
