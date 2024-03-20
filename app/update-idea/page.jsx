@@ -13,7 +13,7 @@ const UpdateIdeaPage = () => {
         </>
       }
     >
-      <UpdatePrompt />
+      <UpdateIdea />
     </Suspense>
   );
 };
@@ -45,7 +45,7 @@ const UpdateIdea = () => {
     }
   }, [ideaId]);
 
-  const UpdateIdea = async (event) => {
+  const updateIdea = async (event) => {
     event.preventDefault();
     setSubmitting(true);
 
@@ -78,7 +78,7 @@ const UpdateIdea = () => {
       post={post}
       setPost={setPost}
       submitting={submitting}
-      handleSubmit={UpdateIdea}
+      handleSubmit={updateIdea}
     />
   );
 };
