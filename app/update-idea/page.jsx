@@ -13,7 +13,8 @@ const EditIdea = () => {
 
   useEffect(() => {
     const getIdeaDetails = async () => {
-      const ideaId = router.query.id; // Fetch ideaId from router.query
+      if (!router.isReady) return; // Check if router is ready
+      const ideaId = router.query.id;
       if (!ideaId) return;
       try {
         const response = await fetch(`/api/idea/${ideaId}`);
@@ -27,14 +28,13 @@ const EditIdea = () => {
       }
     };
     getIdeaDetails();
-  }, [router.query.id]); // Listen to changes in router.query.id
+  }, [router.isReady, router.query.id]); // Listen to changes in router.isReady and router.query.id
 
   const updateIdea = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       const res = await fetch(`/api/idea/${router.query.id}`, {
-        // Use router.query.id
         method: "PATCH",
         body: JSON.stringify({
           idea: post.idea,
@@ -52,6 +52,8 @@ const EditIdea = () => {
       setSubmitting(false);
     }
   };
+
+  if (!router.isReady) return null; // Render nothing until router is ready
 
   return (
     <Form
