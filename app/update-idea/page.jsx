@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
@@ -20,7 +21,7 @@ const UpdateIdea = () => {
   const [submitting, setIsSubmitting] = useState(false);
 
   // Fetch data on the server-side for guaranteed prerendering (optional)
-  export async function getStaticProps({ params }) {
+  async function getStaticProps({ params }) {
     const ideaId = params.id; // Access ideaId from route parameters
     if (!ideaId) return { notFound: true }; // Handle missing ideaId
 
@@ -37,6 +38,7 @@ const UpdateIdea = () => {
       return { notFound: true }; // Potentially handle error cases with a 404 page
     }
   }
+  getStaticProps({ params: { id: ideaId } });
 
   useEffect(() => {
     if (ideaId && !router.isFallback) {
