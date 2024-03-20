@@ -1,21 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router"; // Import useRouter instead of next/navigation
 import Form from "@components/Form";
 
-const editIdea = () => {
+const EditIdea = () => {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [post, setPost] = useState({
     idea: "",
     description: "",
   });
-  const searchParams = useSearchParams();
-  const ideaId = searchParams.get("id");
 
   useEffect(() => {
     const getIdeaDetails = async () => {
-      if (!ideaId) return; // Corrected to check for `ideaId` instead of `id`
+      const ideaId = router.query.id; // Fetch ideaId from router.query
+      if (!ideaId) return;
       try {
         const response = await fetch(`/api/idea/${ideaId}`);
         const data = await response.json();
@@ -28,13 +27,14 @@ const editIdea = () => {
       }
     };
     getIdeaDetails();
-  }, [ideaId]);
+  }, [router.query.id]); // Listen to changes in router.query.id
 
   const updateIdea = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/idea/${ideaId}`, {
+      const res = await fetch(`/api/idea/${router.query.id}`, {
+        // Use router.query.id
         method: "PATCH",
         body: JSON.stringify({
           idea: post.idea,
@@ -64,4 +64,4 @@ const editIdea = () => {
   );
 };
 
-export default editIdea;
+export default EditIdea;
