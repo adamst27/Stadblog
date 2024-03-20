@@ -1,5 +1,7 @@
 # Stadblog
 
-A blog to share projects ideas to practive my skills in Tailwind CSS, NextJS and MangoDb
+![Stadblog Banner](./public/assets/images/stadblog1.png)
 
-Here's the live preview [https://stadblog.vercel.app/]
+A blog to share project ideas to practice my skills in Tailwind CSS, NextJS, and MongoDB.
+
+Here's the live preview [Stadblog](https://stadblog.vercel.app/).
